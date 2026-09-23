@@ -55,6 +55,13 @@ class ShortCutController:
         self._write_json_content(content)
         log.success('Deleted')
                 
+    def list(self):
+        shorcuts = self._load_json_content()[self.name]
+        ORANGE = "\033[38;5;208m"
+        RESET = "\033[0m"
+        log.success('Listing shorcuts') 
+        for sc in shorcuts:
+            log.info(f'{ORANGE}NAME:{RESET} {sc["name"]} | {ORANGE}SCRIPT:{RESET} {sc["script"]}')
         
     def get_shorcut_or_false(self,arg_name):
         if not self._exist_json_file():
@@ -95,6 +102,8 @@ def handle_shorcut(args):
         scc.create(args[1:])
     elif command == 'delete':
         scc.delete(args[1:])
+    elif command in ['ls', 'list']:
+        scc.list()
         
 def get_sortcut_if_exist(comando_name):
     return scc.get_shorcut_or_false(comando_name)
