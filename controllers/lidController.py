@@ -6,6 +6,8 @@ Controlador para acciones de tapa (lid).
 import sys
 import subprocess
 
+from modules.logger.logger import log
+
 # GUIDs de configuración de energía de Windows
 LID_CLOSE_ACTION_GUID = "5ca83367-6e45-459f-a27b-476b1d01c936"
 SUB_BUTTONS = "SUB_BUTTONS"
@@ -46,9 +48,9 @@ def run_powercfg(args):
             text=True,
         )
     except subprocess.CalledProcessError as e:
-        print(f"Error ejecutando powercfg {' '.join(args)}:", file=sys.stderr)
+        log.error(f"Error ejecutando powercfg {' '.join(args)}")
         if e.stderr:
-            print(e.stderr.strip(), file=sys.stderr)
+            log.error(e.stderr.strip())
         sys.exit(1)
 
 
@@ -78,23 +80,23 @@ def handle_lid(args):
     args: lista con [state_arg, action_arg]
     """
     if len(args) != 2:
-        print("Uso: wst lid {plug|unplug|both} {nothing|sleep|hibernate|off}")
-        print("Ejemplo: wst lid unplug sleep")
+        log.error("Uso: wst lid {plug|unplug|both} {nothing|sleep|hibernate|off}")
+        log.info("Ejemplo: wst lid unplug sleep")
         sys.exit(1)
 
     state_arg = args[0].lower()
     action_arg = args[1].lower()
 
     if state_arg not in STATE_MAP:
-        print(f"Estado no válido: '{state_arg}'. Use: plug, unplug, both.")
+        log.error(f"Estado no válido: '{state_arg}'. Use: plug, unplug, both.")
         sys.exit(1)
 
     if action_arg not in ACTION_MAP:
-        print(f"Acción no válida: '{action_arg}'. Use: nothing, sleep, hibernate, off.")
+        log.error(f"Acción no válida: '{action_arg}'. Use: nothing, sleep, hibernate, off.")
         sys.exit(1)
 
     state = STATE_MAP[state_arg]
     action_value = ACTION_MAP[action_arg]
 
     set_lid_close_action(state, action_value)
-    print(f"[OK] Configuracion aplicada: al cerrar la tapa ({state_arg}) -> {action_arg}")
+    log.success(f"Configuracion aplicada: al cerrar la tapa ({state_arg}) -> {action_arg}")

@@ -22,12 +22,13 @@ except ImportError:
     gsudo = None
 
 from controllers.lidController import handle_lid
+from modules.logger.logger import log
 
 
 def elevate_if_needed():
     """Re-ejecuta el script a través de gsudo si no somos administrador."""
     if gsudo is None:
-        print("Advertencia: gsudo no instalado, ejecutando sin elevacion", file=sys.stderr)
+        log.warn("gsudo no instalado, ejecutando sin elevacion")
         return
     if not gsudo.is_admin():
         result = subprocess.run(["gsudo", sys.executable, *sys.argv])
@@ -36,8 +37,8 @@ def elevate_if_needed():
 
 def main():
     if len(sys.argv) < 2:
-        print("Uso: python wst.py <comando> [args...]")
-        print("Comandos disponibles: lid")
+        log.error("Uso: python wst.py <comando> [args...]")
+        log.info("Comandos disponibles: lid")
         sys.exit(1)
 
     command = sys.argv[1].lower()
@@ -46,7 +47,7 @@ def main():
     if command == "lid":
         handle_lid(args)
     else:
-        print(f"Comando no soportado: '{command}'. Comandos disponibles: lid")
+        log.error(f"Comando no soportado: '{command}'. Comandos disponibles: lid")
         sys.exit(1)
 
 
