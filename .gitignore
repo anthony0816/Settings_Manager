@@ -150,3 +150,6 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+
+## Custom 
+shortcut.json

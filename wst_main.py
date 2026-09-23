@@ -23,6 +23,7 @@ except ImportError:
 
 from controllers.lidController import handle_lid
 from modules.logger.logger import log
+from modules.shortcut.shorcut import handle_shorcut, get_sortcut_if_exist
 
 
 def elevate_if_needed():
@@ -43,10 +44,20 @@ def main():
 
     command = sys.argv[1].lower()
     args = sys.argv[2:]
+    entry(command, args)
 
+
+def entry(command, args):
     if command == "lid":
         handle_lid(args)
+    elif command == 'sc':
+        handle_shorcut(args)
     else:
+        sc = get_sortcut_if_exist(command)
+        if sc:
+            new_args = sc['script'].split()
+            entry(new_args[0], new_args[1:])
+            return
         log.error(f"Comando no soportado: '{command}'. Comandos disponibles: lid")
         sys.exit(1)
 
