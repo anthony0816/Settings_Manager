@@ -1,11 +1,7 @@
 import sys
-import ctypes
 from modules.logger.logger import log
+from controllers.platform_handler import platform_handler
 
-
-SPI_SETMOUSESPEED = 0x0071
-SPIF_UPDATEINIFILE = 0x01
-SPIF_SENDCHANGE = 0x02
 
 MIN_SPEED = 1
 MAX_SPEED = 20
@@ -31,17 +27,8 @@ class MouseController:
             log.error(f"Valor fuera de rango: {value}. Debe estar entre {MIN_SPEED} y {MAX_SPEED}.")
             sys.exit(1)
 
-        result = ctypes.windll.user32.SystemParametersInfoW(
-            SPI_SETMOUSESPEED,
-            0,
-            ctypes.c_int(value),
-            SPIF_UPDATEINIFILE | SPIF_SENDCHANGE
-        )
-
-        if not result:
-            error_code = ctypes.GetLastError()
-            log.error(f"Error al cambiar velocidad del mouse. Codigo: {error_code}")
-            sys.exit(1)
+        service = platform_handler.get_platform_service()
+        service.set_mouse_speed(value)
 
         log.success(f"Velocidad del mouse cambiada a {value}")
 

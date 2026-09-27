@@ -4,14 +4,9 @@ Controlador para acciones de tapa (lid).
 """
 
 import sys
-import subprocess
 
 from modules.logger.logger import log
-
-# GUIDs de configuración de energía de Windows
-LID_CLOSE_ACTION_GUID = "5ca83367-6e45-459f-a27b-476b1d01c936"
-SUB_BUTTONS = "SUB_BUTTONS"
-SCHEME_CURRENT = "SCHEME_CURRENT"
+from controllers.platform_handler import platform_handler
 
 # Mapeo de acciones a valores de powercfg
 ACTION_MAP = {
@@ -38,40 +33,14 @@ STATE_MAP = {
 }
 
 
-def run_powercfg(args):
-    """Ejecuta powercfg con los argumentos dados y maneja errores."""
-    try:
-        subprocess.run(
-            ["powercfg"] + args,
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-    except subprocess.CalledProcessError as e:
-        log.error(f"Error ejecutando powercfg {' '.join(args)}")
-        if e.stderr:
-            log.error(e.stderr.strip())
-        sys.exit(1)
-
-
 def set_lid_close_action(state, action_value):
     """
     Cambia la acción al cerrar la tapa.
     state: 'ac', 'dc' o 'both'
     action_value: 0=nada, 1=suspender, 2=hibernar, 3=apagar
     """
-    if state in ("ac", "both"):
-        run_powercfg([
-            "/setacvalueindex", SCHEME_CURRENT, SUB_BUTTONS,
-            LID_CLOSE_ACTION_GUID, str(action_value)
-        ])
-    if state in ("dc", "both"):
-        run_powercfg([
-            "/setdcvalueindex", SCHEME_CURRENT, SUB_BUTTONS,
-            LID_CLOSE_ACTION_GUID, str(action_value)
-        ])
-    # Aplicar cambios al plan de energía activo
-    run_powercfg(["/setactive", SCHEME_CURRENT])
+    service = platform_handler.get_platform_service()
+    service.set_lid_close_action(state, action_value)
 
 
 def handle_lid(args):
