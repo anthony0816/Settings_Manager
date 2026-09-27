@@ -99,4 +99,6 @@ def handle_lid(args):
     action_value = ACTION_MAP[action_arg]
 
     set_lid_close_action(state, action_value)
-    log.success(f"Configuracion aplicada: al cerrar la tapa ({state_arg}) -> {action_arg}")
+    ORANGE = "\033[38;5;208m"
+    RESET = "\033[0m"
+    log.success(f"Configuracion aplicada: al cerrar la tapa ({state_arg}) -> {ORANGE}{action_arg}{RESET}")
