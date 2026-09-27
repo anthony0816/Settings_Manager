@@ -24,6 +24,7 @@ except ImportError:
 from controllers.lidController import handle_lid
 from modules.logger.logger import log
 from modules.shortcut.shorcut import handle_shorcut, get_sortcut_if_exist
+from controllers.mause_controller import handle_mouse
 
 
 def elevate_if_needed():
@@ -52,6 +53,8 @@ def entry(command, args):
         handle_lid(args)
     elif command == 'sc':
         handle_shorcut(args)
+    elif command == 'mouse':
+        handle_mouse(args)
     else:
         sc = get_sortcut_if_exist(command)
         if sc:
