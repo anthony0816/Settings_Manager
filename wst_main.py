@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """
+Gestor de ajustes de Windows desde la linea de comandos.
+
 Uso:
-    python wst.py lid {plug|unplug|both} {nothing|sleep|hibernate|off}
+    python wst_main.py lid    {plug|unplug|both} {nothing|sleep|hibernate|off}
+    python wst_main.py mouse  speed <1-20>
+    python wst_main.py folder status|show|hide|toggle [true|false]
+    python wst_main.py sc     {create|delete|ls}
 
 Ejemplos:
-    python wst.py lid unplug sleep       # Con batería, al cerrar tapa -> suspender
-    python wst.py lid plug hibernate     # Enchufado, al cerrar tapa -> hibernar
-    python wst.py lid both nothing       # Ambos, al cerrar tapa -> no hacer nada
-    python wst.py lid unplug off         # Con batería, al cerrar tapa -> apagar
+    python wst_main.py lid unplug sleep       # Con bateria, al cerrar tapa -> suspender
+    python wst_main.py lid plug hibernate     # Enchufado, al cerrar tapa -> hibernar
+    python wst_main.py lid both nothing       # Ambos, al cerrar tapa -> no hacer nada
+    python wst_main.py mouse speed 10         # Velocidad del mouse
+    python wst_main.py folder toggle          # Alternar carpetas ocultas
 
 Se auto-eleva con gsudo si no tiene privilegios de administrador.
 Requiere tener gsudo instalado y en el PATH.
@@ -25,6 +31,15 @@ from controllers.lidController import handle_lid
 from modules.logger.logger import log
 from modules.shortcut.shorcut import handle_shorcut, get_sortcut_if_exist
 from controllers.mause_controller import handle_mouse
+from controllers.folder_controller import handle_folder
+
+
+GLOBAL_USAGE = """Comandos disponibles:
+  lid    {plug|unplug|both} {nothing|sleep|hibernate|off}
+  mouse  speed <1-20>
+  folder status|show|hide|toggle [true|false]
+  sc     create <script> --name <nombre> | delete <nombre> | ls
+  <nombre de shortcut definido en shortcut.json>"""
 
 
 def elevate_if_needed():
@@ -39,8 +54,8 @@ def elevate_if_needed():
 
 def main():
     if len(sys.argv) < 2:
-        log.error("Uso: python wst.py <comando> [args...]")
-        log.info("Comandos disponibles: lid")
+        log.error("Uso: python wst_main.py <comando> [args...]")
+        log.info(GLOBAL_USAGE)
         sys.exit(1)
 
     command = sys.argv[1].lower()
@@ -55,13 +70,16 @@ def entry(command, args):
         handle_shorcut(args)
     elif command == 'mouse':
         handle_mouse(args)
+    elif command == 'folder':
+        handle_folder(args)
     else:
         sc = get_sortcut_if_exist(command)
         if sc:
             new_args = sc['script'].split()
             entry(new_args[0], new_args[1:])
             return
-        log.error(f"Comando no soportado: '{command}'. Comandos disponibles: lid")
+        log.error(f"Comando no soportado: '{command}'")
+        log.info(GLOBAL_USAGE)
         sys.exit(1)
 
 

@@ -1,4 +1,4 @@
-from services.windows_service import WindowsService
+from services.windows_service import windowsService
 
 
 class PlatformHandler:
@@ -6,7 +6,7 @@ class PlatformHandler:
         import platform
         system = platform.system()
         if system == "Windows":
-            return WindowsService()
+            return windowsService
         else:
             raise NotImplementedError(f"Platform not supported: {system}")
 
