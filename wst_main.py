@@ -4,8 +4,10 @@ Gestor de ajustes de Windows desde la linea de comandos.
 
 Uso:
     python wst_main.py lid    {plug|unplug|both} {nothing|sleep|hibernate|off}
-    python wst_main.py mouse  speed <1-20>
+python wst_main.py mouse speed <1-20>
     python wst_main.py folder status|show|hide|toggle [true|false]
+    python wst_main.py screen {plug|unplug|both} {offscreen|sleep} <tiempo>
+    python wst_main.py screen default
     python wst_main.py sc     {create|delete|ls}
 
 Ejemplos:
@@ -14,6 +16,10 @@ Ejemplos:
     python wst_main.py lid both nothing       # Ambos, al cerrar tapa -> no hacer nada
     python wst_main.py mouse speed 10         # Velocidad del mouse
     python wst_main.py folder toggle          # Alternar carpetas ocultas
+    python wst_main.py screen both offscreen 5   # Apagar pantalla a los 5 min
+    python wst_main.py screen plug sleep 20    # Dormir a los 20 min con cargador
+    python wst_main.py screen unplug offscreen never  # No apagar con bateria
+    python wst_main.py screen default         # 3 min para todo
 
 Se auto-eleva con gsudo si no tiene privilegios de administrador.
 Requiere tener gsudo instalado y en el PATH.
@@ -32,12 +38,15 @@ from modules.logger.logger import log
 from modules.shortcut.shorcut import handle_shorcut, get_sortcut_if_exist
 from controllers.mause_controller import handle_mouse
 from controllers.folder_controller import handle_folder
+from controllers.screen_controller import handle_screen
 
 
 GLOBAL_USAGE = """Comandos disponibles:
   lid    {plug|unplug|both} {nothing|sleep|hibernate|off}
   mouse  speed <1-20>
   folder status|show|hide|toggle [true|false]
+  screen {plug|unplug|both} {offscreen|sleep} <tiempo>
+  screen default | status
   sc     create <script> --name <nombre> | delete <nombre> | ls
   <nombre de shortcut definido en shortcut.json>"""
 
@@ -72,6 +81,8 @@ def entry(command, args):
         handle_mouse(args)
     elif command == 'folder':
         handle_folder(args)
+    elif command == 'screen':
+        handle_screen(args)
     else:
         sc = get_sortcut_if_exist(command)
         if sc:

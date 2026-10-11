@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class PlatformService(ABC):
@@ -16,4 +17,20 @@ class PlatformService(ABC):
 
     @abstractmethod
     def get_hidden_folders_status(self) -> bool:
+        pass
+
+    @abstractmethod
+    def set_screen_timeout(self, state: str, seconds: int) -> None:
+        pass
+
+    @abstractmethod
+    def get_screen_timeout(self, state: str) -> Optional[int]:
+        pass
+
+    @abstractmethod
+    def set_sleep_timeout(self, state: str, seconds: int) -> None:
+        pass
+
+    @abstractmethod
+    def get_sleep_timeout(self, state: str) -> Optional[int]:
         pass
